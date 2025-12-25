@@ -1,21 +1,18 @@
 import { Suspense } from "react";
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/all';
 
 import { Navigation } from "@/components/navigation";
-import { HeroSection } from "@/components/hero-section";
+import HeroSection from "@/components/hero-section";
 import FeaturedProducts from "@/components/featured-products";
+import Tubs from "@/components/tubs";
 import { Footer } from "@/components/footer";
-
-gsap.registerPlugin(ScrollTrigger);
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col">
+    <main className="min-h-screen">
       <Navigation />
       <HeroSection />
       <FeaturedProducts />
-      
+      <Tubs />
       <Suspense fallback={null}>
         <Footer />
       </Suspense>
