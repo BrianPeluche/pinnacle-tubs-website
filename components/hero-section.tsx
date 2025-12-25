@@ -1,120 +1,78 @@
 "use client";
 
-import { useRef } from "react";
 import Image from "next/image";
-import { gsap } from "gsap";
+import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 
-import { useMaskSettings } from "../../constants";
-import ComingSoon from "./ComingSoon";
+// ONLY TWO IMAGE FILES (your repo path)
+import EX_PAGE_START from "../lib/assests/EX_PAGE_START.jpeg";
+import PIN_TUBS from "../lib/assests/PIN_TUBS.jpeg";
 
-// ✅ import from lib/assests (your real path)
-import BG from "../../lib/assests/EX_PAGE_START.jpeg";
-import TEXT from "../../lib/assests/PIN_TUBS.jpeg";
+gsap.registerPlugin(ScrollTrigger);
 
-gsap.registerPlugin(ScrollTrigger, useGSAP);
+export function HeroSection() {
+  const initialMaskPos = "50% 0%";
+  const initialMaskSize = "120% 120%";
+  const maskSize = "1800% 1800%";
 
-export default function Hero(): JSX.Element {
-  const root = useRef<HTMLElement | null>(null);
-  const { initialMaskPos, initialMaskSize, maskSize } = useMaskSettings();
+  useGSAP(() => {
+    gsap.set(".mask-wrapper", {
+      WebkitMaskImage:
+        "radial-gradient(circle at 50% 0%, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 70%)",
+      maskImage:
+        "radial-gradient(circle at 50% 0%, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 70%)",
+      WebkitMaskRepeat: "no-repeat",
+      maskRepeat: "no-repeat",
+      WebkitMaskPosition: initialMaskPos,
+      maskPosition: initialMaskPos,
+      WebkitMaskSize: initialMaskSize,
+      maskSize: initialMaskSize,
+    });
 
-  useGSAP(
-    () => {
-      gsap.set(".mask-wrapper", {
-        maskPosition: initialMaskPos,
-        maskSize: initialMaskSize,
-      });
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: ".hero-section",
+        start: "top top",
+        end: "+=200%",
+        scrub: 2.5,
+        pin: true,
+      },
+    });
 
-      gsap.set(".mask-logo", { marginTop: "-100vh", opacity: 0 });
-      gsap.set(".entrance-message", { marginTop: "0vh" });
-
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: ".hero-section",
-          start: "top top",
-          scrub: 2.5,
-          end: "+=200%",
-          pin: true,
-        },
-      });
-
-      tl.to(".fade-out", { opacity: 0, ease: "power1.inOut" })
-        .to(".scale-out", { scale: 1, ease: "power1.inOut" })
-        .to(".mask-wrapper", { maskSize, ease: "power1.inOut" }, "<")
-        .to(".mask-wrapper", { opacity: 0 })
-        .to(
-          ".overlay-logo",
-          {
-            opacity: 1,
-            onComplete: () => gsap.to(".overlay-logo", { opacity: 0 }),
-          },
-          "<"
-        )
-        .to(
-          ".entrance-message",
-          {
-            duration: 1,
-            ease: "power1.inOut",
-            maskImage:
-              "radial-gradient(circle at 50% 0vh, black 50%, transparent 100%)",
-          },
-          "<"
-        );
-    },
-    { scope: root, dependencies: [initialMaskPos, initialMaskSize, maskSize] }
-  );
+    tl.to(".hero-text", { opacity: 0, ease: "power1.inOut" })
+      .to(".hero-bg", { scale: 1.05, ease: "power1.inOut" }, "<")
+      .to(
+        ".mask-wrapper",
+        { WebkitMaskSize: maskSize, maskSize, ease: "power1.inOut" },
+        "<"
+      )
+      .to(".mask-wrapper", { opacity: 0, duration: 0.4 });
+  });
 
   return (
-    <section ref={root} className="hero-section">
-      {/* ONLY 2 image assets used: EX_PAGE_START.jpeg + PIN_TUBS.jpeg */}
-      <div className="mask-wrapper relative size-full overflow-hidden">
-        {/* background */}
+    <section className="hero-section relative h-[100svh] w-full overflow-hidden">
+      <div className="mask-wrapper relative h-full w-full">
         <Image
-          src={BG}
-          alt="background"
+          src={EX_PAGE_START}
+          alt="Background"
           fill
           priority
-          className="scale-out object-cover"
+          sizes="100vw"
+          className="hero-bg object-cover"
         />
 
-        {/* text */}
-        <Image
-          src={TEXT}
-          alt="pinnacle tubs text"
-          width={TEXT.width}
-          height={TEXT.height}
-          priority
-          className="title-logo fade-out"
-        />
-
-        {/* If you still need the play/trailer elements, do them with HTML/CSS (no extra images) */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Image
+            src={PIN_TUBS}
+            alt="Pinnacle Tubs"
+            priority
+            className="hero-text h-auto w-[min(900px,90vw)]"
+          />
+        </div>
       </div>
-
-      {/* Reuse SAME text file without adding more <img> tags (divs with background-image) */}
-      <div
-        className="mask-logo size-full"
-        style={{
-          backgroundImage: `url(${TEXT.src})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-      />
-
-      <div className="fake-logo-wrapper">
-        <div
-          className="overlay-logo"
-          style={{
-            backgroundImage: `url(${TEXT.src})`,
-            backgroundSize: "contain",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-          }}
-        />
-      </div>
-
-      <ComingSoon />
     </section>
   );
 }
+
+export default HeroSection;
