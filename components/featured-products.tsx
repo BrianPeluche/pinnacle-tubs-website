@@ -21,13 +21,13 @@ export default function FeaturedProducts() {
         trigger: ".first-vd-wrapper",
         start: "top top",
         end: "+=300%",
-        scrub: 1,
+        scrub: 6,
         pin: true,
        // markers: true, //
       },
     });
 
-    tl.to(".hero-section", { delay: 0.1, opacity: 0, ease: "none" });
+    tl.to(".hero-section", { delay: 0.2, opacity: 0, ease: "none" });
     tl.to(".first-vd-wrapper", { opacity: 1.5, duration: 20, ease: "none" });
 
     const video = videoRef.current;
