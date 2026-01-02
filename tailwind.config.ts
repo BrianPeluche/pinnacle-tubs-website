@@ -53,10 +53,28 @@ export default {
           "5": "hsl(var(--chart-5))",
         },
       },
+      fontFamily: {
+        sans: ["var(--font-roboto)", "system-ui", "sans-serif"],
+        mono: ["var(--font-roboto)", "system-ui", "sans-serif"],
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      keyframes: {
+        marquee: {
+          "0%": { transform: "translateX(0%)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+        marqueeReverse: {
+          "0%": { transform: "translateX(-50%)" },
+          "100%": { transform: "translateX(0%)" },
+        },
+      },
+      animation: {
+        marquee: "marquee 30s linear infinite",
+        marqueeReverse: "marqueeReverse 30s linear infinite",
       },
     },
   },
