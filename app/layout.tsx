@@ -1,8 +1,9 @@
 //layout.tsx
 
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Roboto } from "next/font/google";
 import { ThemeProvider } from "next-themes";
+import MotionProvider from "@/components/motion/MotionProvider";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -16,8 +17,9 @@ export const metadata: Metadata = {
     "Discover luxury hot tubs and spas for your home. Quality, comfort, and relaxation.",
 };
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const roboto = Roboto({
+  weight: ["400", "500", "700"],
+  variable: "--font-roboto",
   display: "swap",
   subsets: ["latin"],
 });
@@ -29,14 +31,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.className} antialiased`}>
+      <body className={`${roboto.variable} font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <MotionProvider>{children}</MotionProvider>
         </ThemeProvider>
       </body>
     </html>

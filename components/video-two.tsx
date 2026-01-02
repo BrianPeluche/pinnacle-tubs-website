@@ -1,6 +1,3 @@
-// video-two.tsx
-
-// video-two.tsx
 "use client";
 
 import { useRef } from "react";
@@ -19,18 +16,28 @@ const VideoTwo = () => {
     const video = videoRef.current;
     if (!section || !video) return;
 
-    // keep sizing correct: DON'T offset layout with negative margin
     gsap.set(section, { opacity: 0 });
+
+    let targetTime = 0;
+
+    const updateVideoTime = () => {
+      if (!video.duration) return;
+      const delta = targetTime - video.currentTime;
+      if (Math.abs(delta) < 0.01) return;
+      video.currentTime += delta * 0.12;
+    };
 
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: section,
         start: "top top",
         end: "bottom top",
-        scrub: 5,
+        scrub: true,
         pin: true,
         invalidateOnRefresh: true,
-        // markers: true,
+        onUpdate: (self) => {
+          targetTime = video.duration * self.progress;
+        },
       },
     });
 
@@ -38,24 +45,17 @@ const VideoTwo = () => {
 
     const onLoadedMetadata = () => {
       video.currentTime = 0;
-
-      tl.to(
-        video,
-        {
-          currentTime: video.duration,
-          duration: 2,
-          ease: "none", // smoother scrubbing than power1.inOut
-        },
-        "<"
-      );
-
+      targetTime = 0;
       ScrollTrigger.refresh();
     };
 
     if (video.readyState >= 1) onLoadedMetadata();
     else video.addEventListener("loadedmetadata", onLoadedMetadata);
 
+    gsap.ticker.add(updateVideoTime);
+
     return () => {
+      gsap.ticker.remove(updateVideoTime);
       video.removeEventListener("loadedmetadata", onLoadedMetadata);
       tl.scrollTrigger?.kill();
       tl.kill();

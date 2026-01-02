@@ -1,49 +1,53 @@
-//tubs.tsx
-
 "use client";
 
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
+import { useEffect, useRef } from "react";
+import {
+  m,
+  useMotionValueEvent,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "@/components/motion";
 
 import TME_EVO from "../lib/assests/TME_EVO.jpeg";
 import TACO from "../lib/assests/TACO.jpeg";
 import VIEW_BIG_BEAR from "../lib/assests/VIEW_BIG_BEAR.jpeg";
 
-gsap.registerPlugin(ScrollTrigger);
-
 export default function Tubs() {
-  useGSAP(() => {
-    // ✅ match the original behavior
-    gsap.set(".jason", { marginTop: "-80vh" });
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const firstVideoRef = useRef<HTMLVideoElement | null>(null);
+  const shouldReduceMotion = useReducedMotion();
 
-    gsap
-      .timeline({
-        scrollTrigger: {
-          trigger: ".jason",
-          start: "top 90%",
-          end: "10% center",
-          scrub: 2,
-        },
-      })
-      .to(".first-vd", { opacity: 0, duration: 1, ease: "power1.inOut" });
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start 90%", "end center"],
+  });
 
-    gsap.to(".jason .img-box", {
-      scrollTrigger: {
-        trigger: ".jason",
-        start: "top center",
-        end: "80% center",
-        scrub: 2,
-      },
-      y: -300,
-      duration: 1,
-      ease: "power1.inOut",
-    });
+  const imageBoxY = useTransform(scrollYProgress, [0, 1], [0, -300]);
+  const firstVideoOpacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
+
+  useEffect(() => {
+    firstVideoRef.current = document.querySelector(".first-vd") as HTMLVideoElement | null;
+    return () => {
+      if (firstVideoRef.current) firstVideoRef.current.style.opacity = "";
+    };
   }, []);
 
+  useMotionValueEvent(firstVideoOpacity, "change", (value) => {
+    if (shouldReduceMotion) return;
+    const video = firstVideoRef.current;
+    if (!video) return;
+    video.style.opacity = String(value);
+  });
+
+  const imageBoxYStyle = shouldReduceMotion ? 0 : imageBoxY;
+
   return (
-    <section className="jason relative w-full px-6 md:px-10 lg:px-16 py-24 lg:py-32">
-      {/* ✅ container + 2-column layout on desktop */}
+    <section
+      ref={sectionRef}
+      className="jason relative w-full px-6 md:px-10 lg:px-16 py-24 lg:py-32"
+    >
+      {/*  container + 2-column layout on desktop */}
       <div className="mx-auto w-full max-w-7xl flex flex-col gap-14 lg:flex-row lg:items-start lg:justify-between">
         {/* LEFT: text */}
         <div className="jason-content w-full max-w-lg">
@@ -53,11 +57,11 @@ export default function Tubs() {
           </h2>
 
           <p className="mt-6 text-base md:text-lg leading-relaxed text-muted-foreground">
-            Designed for comfort and durability—whether you’re hosting friends,
+            Designed for comfort and durability - whether you&apos;re hosting friends,
             winding down after a long day, or enjoying a weekend getaway.
           </p>
 
-          {/* “jason-2” image under the text */}
+          {/* "jason-2" image under the text */}
           <div className="jason-2 mt-10">
             <img
               src={TACO.src}
@@ -68,7 +72,10 @@ export default function Tubs() {
         </div>
 
         {/* RIGHT: images (aligned to the right on desktop) */}
-        <div className="img-box w-full lg:w-auto lg:mt-96">
+        <m.div
+          className="img-box w-full lg:w-auto lg:mt-96"
+          style={{ y: imageBoxYStyle, willChange: "transform" }}
+        >
           <div className="space-y-6 lg:space-y-8 lg:flex lg:flex-col lg:items-end">
             <div className="jason-1 w-full max-w-md">
               <img
@@ -86,7 +93,7 @@ export default function Tubs() {
               />
             </div>
           </div>
-        </div>
+        </m.div>
       </div>
     </section>
   );
